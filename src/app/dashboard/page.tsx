@@ -65,6 +65,9 @@ export default async function DashboardPage() {
           <Button asChild variant="secondary">
             <a href="/metas">Metas</a>
           </Button>
+          <Button asChild variant="secondary">
+            <a href="/posso-gastar">Posso gastar?</a>
+          </Button>
           <Button asChild>
             <a href="/onboarding">{profile ? "Editar perfil" : "Configurar onboarding"}</a>
           </Button>

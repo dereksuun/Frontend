@@ -164,6 +164,18 @@ type GoalsResponse = {
   goals: Goal[];
 };
 
+export type CanIBuySimulation = {
+  ready: boolean;
+  decision?: "CAN_BUY" | "TIGHT" | "DO_NOT_BUY";
+  message: string;
+  currentFreeMoneyCents?: number;
+  immediateImpactCents?: number;
+  projectedFreeMoneyCents?: number;
+  projectedInvoiceCents?: number;
+  projectedCreditCardRisk?: "SAFE" | "ATTENTION" | "DANGEROUS" | "CHAOTIC";
+  installments?: number[];
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -277,4 +289,30 @@ export async function getGoals(user: ApiUser) {
 
   const data = (await response.json()) as GoalsResponse;
   return data.goals;
+}
+
+export async function simulateCanIBuy(
+  user: ApiUser,
+  input: {
+    description: string;
+    amountCents: number;
+    installmentsCount: number;
+    paymentType: "CASH" | "DEBIT" | "CREDIT";
+  }
+) {
+  const response = await fetch(`${getApiUrl()}/api/simulator/can-i-buy`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(input),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel simular a compra.");
+  }
+
+  return (await response.json()) as CanIBuySimulation;
 }
