@@ -26,6 +26,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         "/cartoes",
         "/gastos",
         "/metas",
+        "/posso-gastar",
         "/configuracoes"
       ].some((path) => request.nextUrl.pathname.startsWith(path));
 

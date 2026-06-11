@@ -8,6 +8,7 @@ export const config = {
     "/cartoes/:path*",
     "/gastos/:path*",
     "/metas/:path*",
+    "/posso-gastar/:path*",
     "/configuracoes/:path*"
   ]
 };
