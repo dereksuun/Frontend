@@ -57,9 +57,14 @@ export default async function InvestimentosPage({ searchParams }: PageProps) {
             Estime cenarios de crescimento com aportes mensais, prazo e taxa anual. Use como estudo, nao como ordem.
           </p>
         </div>
-        <Button asChild>
-          <a href="/dashboard">Dashboard</a>
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="secondary">
+            <a href="/indicadores">Indicadores</a>
+          </Button>
+          <Button asChild>
+            <a href="/dashboard">Dashboard</a>
+          </Button>
+        </div>
       </header>
 
       <section className="mt-8 rounded-lg border border-secondary/40 bg-secondary/10 p-5 text-secondary">

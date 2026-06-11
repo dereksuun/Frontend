@@ -9,7 +9,8 @@ const modules = [
   { href: "/gastos", label: "Gastos" },
   { href: "/metas", label: "Metas" },
   { href: "/posso-gastar", label: "Posso Gastar?" },
-  { href: "/investimentos", label: "Investimentos" }
+  { href: "/investimentos", label: "Investimentos" },
+  { href: "/indicadores", label: "Indicadores" }
 ];
 
 export default async function ConfiguracoesPage() {

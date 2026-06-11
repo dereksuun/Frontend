@@ -10,6 +10,7 @@ export const config = {
     "/metas/:path*",
     "/posso-gastar/:path*",
     "/investimentos/:path*",
+    "/indicadores/:path*",
     "/configuracoes/:path*"
   ]
 };
