@@ -104,6 +104,28 @@ type CreditCardPurchasesResponse = {
   purchases: CreditCardPurchase[];
 };
 
+export type DashboardSummary = {
+  realFreeMoneyCents: number;
+  expectedIncomeCents: number;
+  receivedIncomeCents: number;
+  pendingExpensesCount: number;
+  pendingExpensesCents: number;
+  currentInvoiceCents: number;
+  futureInstallmentsCount: number;
+  protectedGoalCents: number;
+  nextPayment: {
+    day: number;
+    label: string;
+    percent: number;
+  };
+  creditCardRisk: "SAFE" | "ATTENTION" | "DANGEROUS" | "CHAOTIC";
+};
+
+type DashboardSummaryResponse = {
+  profile: FinancialProfile | null;
+  summary: DashboardSummary | null;
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -176,4 +198,17 @@ export async function getCreditCardPurchases(user: ApiUser) {
 
   const data = (await response.json()) as CreditCardPurchasesResponse;
   return data.purchases;
+}
+
+export async function getDashboardSummary(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/dashboard/summary`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar o resumo financeiro.");
+  }
+
+  return (await response.json()) as DashboardSummaryResponse;
 }
