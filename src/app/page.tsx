@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-8 py-8">
       <nav className="flex items-center justify-between">
-        <span className="text-lg font-semibold tracking-normal">Bufunfometro</span>
+        <span className="text-lg font-semibold tracking-normal">Derycash</span>
         <Button variant="ghost">Entrar</Button>
       </nav>
 
@@ -19,7 +19,7 @@ export default function HomePage() {
         <div className="max-w-3xl">
           <p className="mb-4 text-sm font-medium text-secondary">Controle financeiro sem cara de planilha</p>
           <h1 className="text-5xl font-semibold tracking-normal text-foreground md:text-7xl">
-            Meca sua bufunfa antes dela sumir.
+            Veja quanto dinheiro voce realmente pode usar.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
             Organize renda, contas, cartao, metas e investimentos para descobrir quanto dinheiro

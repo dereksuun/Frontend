@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bufunfometro",
-  description: "O app que mede sua bufunfa antes dela sumir."
+  title: "Derycash",
+  description: "O app que mostra quanto dinheiro voce realmente pode usar."
 };
 
 export default function RootLayout({
