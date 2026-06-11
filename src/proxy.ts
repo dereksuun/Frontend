@@ -9,6 +9,7 @@ export const config = {
     "/gastos/:path*",
     "/metas/:path*",
     "/posso-gastar/:path*",
+    "/investimentos/:path*",
     "/configuracoes/:path*"
   ]
 };
