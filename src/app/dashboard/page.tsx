@@ -3,7 +3,8 @@ import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { MotionCard } from "@/components/motion/motion-card";
 import { SpendingCategoryChart } from "@/components/charts/spending-category-chart";
-import { getDashboardSummary, getTransactions, type DashboardSummary } from "@/lib/api";
+import { MonthlyTimeline } from "@/components/dashboard/monthly-timeline";
+import { getDashboardSummary, getDashboardTimeline, getTransactions, type DashboardSummary } from "@/lib/api";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -41,9 +42,10 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [{ profile, summary }, transactions] = await Promise.all([
+  const [{ profile, summary }, transactions, timeline] = await Promise.all([
     getDashboardSummary(session.user),
-    getTransactions(session.user)
+    getTransactions(session.user),
+    getDashboardTimeline(session.user)
   ]);
   const categoryTotals = buildCategoryTotals(transactions);
   const cards = summary
@@ -146,16 +148,21 @@ export default async function DashboardPage() {
           </section>
 
           <section className="mt-8">
-            <div className="mb-4 flex items-end justify-between gap-4">
+            <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
               <div>
-                <p className="text-sm text-secondary">Raio-X da bufunfa</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-normal">Gastos por categoria</h2>
+                <div className="mb-4 flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-sm text-secondary">Raio-X da bufunfa</p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-normal">Gastos por categoria</h2>
+                  </div>
+                  <Button asChild variant="secondary">
+                    <a href="/gastos">Registrar gasto</a>
+                  </Button>
+                </div>
+                <SpendingCategoryChart data={categoryTotals} />
               </div>
-              <Button asChild variant="secondary">
-                <a href="/gastos">Registrar gasto</a>
-              </Button>
+              <MonthlyTimeline events={timeline.events} />
             </div>
-            <SpendingCategoryChart data={categoryTotals} />
           </section>
         </>
       ) : (
