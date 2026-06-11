@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { simulateCanIBuy } from "@/lib/api";
+import { getCreditCards, simulateCanIBuy } from "@/lib/api";
+import { saveSimulatedPurchase } from "./actions";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -19,6 +20,10 @@ function reaisToCents(value: string | undefined) {
 
 function firstParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function todayInputValue() {
+  return new Date().toISOString().slice(0, 10);
 }
 
 type PageProps = {
@@ -41,8 +46,11 @@ export default async function PossoGastarPage({ searchParams }: PageProps) {
   const params = (await searchParams) ?? {};
   const amount = firstParam(params.amount);
   const description = firstParam(params.description) ?? "Compra simulada";
+  const category = firstParam(params.category) ?? "Geral";
+  const purchasedAt = firstParam(params.purchasedAt) ?? todayInputValue();
   const installmentsCount = Number(firstParam(params.installmentsCount) ?? 1);
   const paymentType = (firstParam(params.paymentType) ?? "CASH") as "CASH" | "DEBIT" | "CREDIT";
+  const cards = await getCreditCards(session.user);
   const shouldSimulate = Boolean(amount);
   const simulation = shouldSimulate
     ? await simulateCanIBuy(session.user, {
@@ -84,6 +92,27 @@ export default async function PossoGastarPage({ searchParams }: PageProps) {
               type="text"
             />
           </label>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Categoria</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                defaultValue={category}
+                name="category"
+                type="text"
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Data</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                defaultValue={purchasedAt}
+                name="purchasedAt"
+                type="date"
+              />
+            </label>
+          </div>
 
           <label className="grid gap-2 text-sm">
             <span className="text-muted-foreground">Valor</span>
@@ -162,6 +191,60 @@ export default async function PossoGastarPage({ searchParams }: PageProps) {
                   </strong>
                 </article>
               </div>
+            ) : null}
+
+            {simulation.ready ? (
+              <form action={saveSimulatedPurchase} className="rounded-lg border bg-card p-5">
+                <div>
+                  <p className="text-sm text-secondary">Transformar em registro</p>
+                  <h3 className="mt-2 text-2xl font-semibold tracking-normal">Salvar essa compra</h3>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    Se voce decidiu seguir, o Derycash registra a compra no modulo certo e recalcula o dashboard.
+                  </p>
+                </div>
+
+                <input name="description" type="hidden" value={description} />
+                <input name="category" type="hidden" value={category} />
+                <input name="purchasedAt" type="hidden" value={purchasedAt} />
+                <input name="amountCents" type="hidden" value={reaisToCents(amount)} />
+                <input name="installmentsCount" type="hidden" value={Number.isFinite(installmentsCount) ? installmentsCount : 1} />
+                <input name="paymentType" type="hidden" value={paymentType} />
+
+                {paymentType === "CREDIT" ? (
+                  <label className="mt-5 grid gap-2 text-sm">
+                    <span className="text-muted-foreground">Cartao</span>
+                    <select
+                      className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                      disabled={cards.length === 0}
+                      name="creditCardId"
+                      required
+                    >
+                      {cards.map((card) => (
+                        <option key={card.id} value={card.id}>
+                          {card.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+
+                {paymentType === "CREDIT" && cards.length === 0 ? (
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Cadastre um cartao antes de salvar compras no credito.
+                  </p>
+                ) : null}
+
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Button disabled={paymentType === "CREDIT" && cards.length === 0} type="submit">
+                    Salvar compra
+                  </Button>
+                  {paymentType === "CREDIT" && cards.length === 0 ? (
+                    <Button asChild variant="secondary">
+                      <a href="/cartoes">Cadastrar cartao</a>
+                    </Button>
+                  ) : null}
+                </div>
+              </form>
             ) : null}
           </section>
         ) : (
