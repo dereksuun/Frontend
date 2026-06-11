@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { getApiUrl } from "@/lib/api";
+import { getApiUrl, getApiUserHeaders, getApiUserId } from "@/lib/api";
 
 function reaisToCents(value: FormDataEntryValue | null) {
   const normalized = String(value ?? "0").replace(/\./g, "").replace(",", ".");
@@ -16,9 +16,8 @@ function numberValue(value: FormDataEntryValue | null, fallback: number) {
 
 export async function saveFinancialProfile(formData: FormData) {
   const session = await auth();
-  const userId = session?.user?.email ?? session?.user?.name;
 
-  if (!session?.user || !userId) {
+  if (!session?.user || !getApiUserId(session.user)) {
     redirect("/login");
   }
 
@@ -39,9 +38,7 @@ export async function saveFinancialProfile(formData: FormData) {
     method: "PUT",
     headers: {
       "content-type": "application/json",
-      "x-user-id": userId,
-      "x-user-email": session.user.email ?? "",
-      "x-user-name": session.user.name ?? ""
+      ...getApiUserHeaders(session.user)
     },
     body: JSON.stringify(payload),
     cache: "no-store"
