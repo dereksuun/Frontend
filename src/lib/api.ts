@@ -176,6 +176,18 @@ export type CanIBuySimulation = {
   installments?: number[];
 };
 
+export type InvestmentSimulation = {
+  finalAmountCents: number;
+  investedCents: number;
+  earningsCents: number;
+  monthlyRatePercent: number;
+  timeline: Array<{
+    month: number;
+    balanceCents: number;
+  }>;
+  disclaimer: string;
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -315,4 +327,31 @@ export async function simulateCanIBuy(
   }
 
   return (await response.json()) as CanIBuySimulation;
+}
+
+export async function simulateInvestment(
+  user: ApiUser,
+  input: {
+    initialAmountCents: number;
+    monthlyContributionCents: number;
+    months: number;
+    annualRatePercent: number;
+  }
+) {
+  const response = await fetch(`${getApiUrl()}/api/investments/simulate`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(input),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel simular o investimento.");
+  }
+
+  const data = (await response.json()) as { simulation: InvestmentSimulation };
+  return data.simulation;
 }
