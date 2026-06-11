@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { HandCoins } from "lucide-react";
 import { auth } from "@/auth";
+import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { getIncomes } from "@/lib/api";
 import { createIncome, deleteIncome } from "./actions";
@@ -79,13 +81,12 @@ export default async function RendasPage() {
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="grid gap-4">
           {incomes.length === 0 ? (
-            <article className="rounded-lg border border-dashed bg-card p-6">
-              <p className="text-sm text-muted-foreground">Nenhuma renda extra registrada.</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-normal">A bufunfa extra ainda nao apareceu.</h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Quando entrar freela, reembolso ou Pix perdido no tempo, cadastre aqui para o dashboard recalcular.
-              </p>
-            </article>
+            <EmptyState
+              description="Quando entrar freela, reembolso ou Pix perdido no tempo, cadastre aqui para o dashboard recalcular."
+              eyebrow="Nenhuma renda extra registrada."
+              icon={HandCoins}
+              title="A bufunfa extra ainda nao apareceu."
+            />
           ) : (
             incomes.map((income) => (
               <article key={income.id} className="rounded-lg border bg-card p-5">

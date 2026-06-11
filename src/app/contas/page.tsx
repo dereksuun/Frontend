@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { ReceiptText } from "lucide-react";
 import { auth } from "@/auth";
+import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { getRecurringExpenses } from "@/lib/api";
 import { createRecurringExpense, deleteRecurringExpense, payRecurringExpense } from "./actions";
@@ -59,15 +61,12 @@ export default async function ContasPage() {
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="grid gap-4">
           {expenses.length === 0 ? (
-            <article className="rounded-lg border border-dashed bg-card p-6">
-              <p className="text-sm text-muted-foreground">Nenhum boleto inevitavel cadastrado.</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-normal">
-                Ou voce esta livre, ou esqueceu de alguma coisa.
-              </h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Comece pelas contas que sempre aparecem: moradia, internet, celular, assinaturas e mensalidades.
-              </p>
-            </article>
+            <EmptyState
+              description="Comece pelas contas que sempre aparecem: moradia, internet, celular, assinaturas e mensalidades."
+              eyebrow="Nenhum boleto inevitavel cadastrado."
+              icon={ReceiptText}
+              title="Ou voce esta livre, ou esqueceu de alguma coisa."
+            />
           ) : (
             expenses.map((expense) => {
               const monthlyExpense = expense.monthlyExpenses[0];

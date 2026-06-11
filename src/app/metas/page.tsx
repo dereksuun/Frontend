@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { PiggyBank } from "lucide-react";
 import { auth } from "@/auth";
+import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { getGoals } from "@/lib/api";
 import { addGoalContribution, createGoal, deleteGoal } from "./actions";
@@ -76,15 +78,12 @@ export default async function MetasPage() {
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="grid gap-4">
           {goals.length === 0 ? (
-            <article className="rounded-lg border border-dashed bg-card p-6">
-              <p className="text-sm text-muted-foreground">Nenhum cofrinho criado ainda.</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-normal">
-                Bora dar um destino decente pra sua bufunfa?
-              </h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Crie uma meta para acompanhar progresso, aportes e quanto falta guardar.
-              </p>
-            </article>
+            <EmptyState
+              description="Crie uma meta para acompanhar progresso, aportes e quanto falta guardar."
+              eyebrow="Nenhum cofrinho criado ainda."
+              icon={PiggyBank}
+              title="Bora dar um destino decente pra sua bufunfa?"
+            />
           ) : (
             goals.map((goal) => {
               const percent = progressPercent(goal.currentCents, goal.targetAmountCents);
