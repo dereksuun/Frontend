@@ -111,6 +111,7 @@ export type DashboardSummary = {
   pendingExpensesCount: number;
   pendingExpensesCents: number;
   currentInvoiceCents: number;
+  monthlyTransactionsCents: number;
   futureInstallmentsCount: number;
   protectedGoalCents: number;
   nextPayment: {
@@ -124,6 +125,20 @@ export type DashboardSummary = {
 type DashboardSummaryResponse = {
   profile: FinancialProfile | null;
   summary: DashboardSummary | null;
+};
+
+export type Transaction = {
+  id: string;
+  userId: string;
+  description: string;
+  amountCents: number;
+  occurredAt: string;
+  category: string;
+  paymentType: string;
+};
+
+type TransactionsResponse = {
+  transactions: Transaction[];
 };
 
 export function getApiUserId(user: ApiUser) {
@@ -211,4 +226,18 @@ export async function getDashboardSummary(user: ApiUser) {
   }
 
   return (await response.json()) as DashboardSummaryResponse;
+}
+
+export async function getTransactions(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/transactions`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar os gastos.");
+  }
+
+  const data = (await response.json()) as TransactionsResponse;
+  return data.transactions;
 }
