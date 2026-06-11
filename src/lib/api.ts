@@ -141,6 +141,29 @@ type TransactionsResponse = {
   transactions: Transaction[];
 };
 
+export type GoalContribution = {
+  id: string;
+  goalId: string;
+  userId: string;
+  amountCents: number;
+  contributedAt: string;
+};
+
+export type Goal = {
+  id: string;
+  userId: string;
+  name: string;
+  targetAmountCents: number;
+  currentCents: number;
+  deadline: string | null;
+  priority: number;
+  contributions: GoalContribution[];
+};
+
+type GoalsResponse = {
+  goals: Goal[];
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -240,4 +263,18 @@ export async function getTransactions(user: ApiUser) {
 
   const data = (await response.json()) as TransactionsResponse;
   return data.transactions;
+}
+
+export async function getGoals(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/goals`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar as metas.");
+  }
+
+  const data = (await response.json()) as GoalsResponse;
+  return data.goals;
 }
