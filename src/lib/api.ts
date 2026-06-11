@@ -60,6 +60,22 @@ type RecurringExpensesResponse = {
   expenses: RecurringExpense[];
 };
 
+export type CreditCard = {
+  id: string;
+  userId: string;
+  name: string;
+  institution: string | null;
+  limitCents: number;
+  closingDay: number;
+  dueDay: number;
+  color: string | null;
+  active: boolean;
+};
+
+type CreditCardsResponse = {
+  cards: CreditCard[];
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -104,4 +120,18 @@ export async function getRecurringExpenses(user: ApiUser) {
 
   const data = (await response.json()) as RecurringExpensesResponse;
   return data.expenses;
+}
+
+export async function getCreditCards(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/credit-cards`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar os cartoes.");
+  }
+
+  const data = (await response.json()) as CreditCardsResponse;
+  return data.cards;
 }
