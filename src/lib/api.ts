@@ -29,6 +29,37 @@ type FinancialProfileResponse = {
   profile: FinancialProfile | null;
 };
 
+export type MonthlyExpense = {
+  id: string;
+  recurringExpenseId: string;
+  userId: string;
+  referenceMonth: string;
+  expectedAmountCents: number;
+  actualAmountCents: number | null;
+  paidAt: string | null;
+  status: "PENDING" | "PAID" | "OVERDUE" | "IGNORED" | "CANCELED";
+};
+
+export type RecurringExpense = {
+  id: string;
+  userId: string;
+  name: string;
+  expectedAmountCents: number;
+  dueDay: number;
+  category: string;
+  type: string;
+  isEssential: boolean;
+  isVariable: boolean;
+  status: "PENDING" | "PAID" | "OVERDUE" | "IGNORED" | "CANCELED";
+  startsAt: string | null;
+  endsAt: string | null;
+  monthlyExpenses: MonthlyExpense[];
+};
+
+type RecurringExpensesResponse = {
+  expenses: RecurringExpense[];
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -59,4 +90,18 @@ export async function getFinancialProfile(user: ApiUser) {
 
   const data = (await response.json()) as FinancialProfileResponse;
   return data.profile;
+}
+
+export async function getRecurringExpenses(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/recurring-expenses`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar as contas fixas.");
+  }
+
+  const data = (await response.json()) as RecurringExpensesResponse;
+  return data.expenses;
 }

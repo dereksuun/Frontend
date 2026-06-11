@@ -48,9 +48,14 @@ export default async function DashboardPage() {
             {profile ? "Seu perfil financeiro inicial ja esta carregado." : "Vamos montar seu perfil financeiro."}
           </p>
         </div>
-        <Button asChild>
-          <a href="/onboarding">{profile ? "Editar perfil" : "Configurar onboarding"}</a>
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild variant="secondary">
+            <a href="/contas">Contas fixas</a>
+          </Button>
+          <Button asChild>
+            <a href="/onboarding">{profile ? "Editar perfil" : "Configurar onboarding"}</a>
+          </Button>
+        </div>
       </header>
 
       <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
