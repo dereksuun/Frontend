@@ -26,11 +26,15 @@ export default function HomePage() {
             realmente esta livre.
           </p>
           <div className="mt-8 flex gap-3">
-            <Button>
-              Abrir dashboard
-              <ArrowRight className="h-4 w-4" />
+            <Button asChild>
+              <a href="/dashboard">
+                Abrir dashboard
+                <ArrowRight className="h-4 w-4" />
+              </a>
             </Button>
-            <Button variant="secondary">Simular compra</Button>
+            <Button asChild variant="secondary">
+              <a href="/login">Entrar</a>
+            </Button>
           </div>
         </div>
 
