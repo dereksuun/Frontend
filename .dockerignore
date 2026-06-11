@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+dist
+coverage
+relatorios
+.env
+.env*.local
+*.log
+*.tsbuildinfo
+.git
+.vercel
