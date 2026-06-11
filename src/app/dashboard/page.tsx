@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { MotionCard } from "@/components/motion/motion-card";
 import { getDashboardSummary, type DashboardSummary } from "@/lib/api";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
@@ -78,36 +79,36 @@ export default async function DashboardPage() {
       </header>
 
       <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => (
-          <article key={card.label} className="rounded-lg border bg-card p-5">
+        {cards.map((card, index) => (
+          <MotionCard key={card.label} delay={index * 80}>
             <p className="text-sm text-muted-foreground">{card.label}</p>
             <strong className="mt-3 block text-2xl font-semibold">{card.value}</strong>
-          </article>
+          </MotionCard>
         ))}
       </section>
 
       {summary ? (
         <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <article className="rounded-lg border bg-card p-5">
+          <MotionCard delay={360}>
             <p className="text-sm text-muted-foreground">Meta protegida</p>
             <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.protectedGoalCents)}</strong>
-          </article>
-          <article className="rounded-lg border bg-card p-5">
+          </MotionCard>
+          <MotionCard delay={440}>
             <p className="text-sm text-muted-foreground">Proximo pagamento</p>
             <strong className="mt-3 block text-2xl font-semibold">
               Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
             </strong>
-          </article>
-          <article className="rounded-lg border bg-card p-5">
+          </MotionCard>
+          <MotionCard delay={520}>
             <p className="text-sm text-muted-foreground">Gastos avulsos</p>
             <strong className="mt-3 block text-2xl font-semibold">
               {formatCurrency(summary.monthlyTransactionsCents)}
             </strong>
-          </article>
-          <article className="rounded-lg border bg-card p-5">
+          </MotionCard>
+          <MotionCard delay={600}>
             <p className="text-sm text-muted-foreground">Risco do mes</p>
             <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
-          </article>
+          </MotionCard>
         </section>
       ) : (
         <section className="mt-8 rounded-lg border border-dashed bg-card p-6">
