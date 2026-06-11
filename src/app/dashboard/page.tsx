@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { getFinancialProfile } from "@/lib/api";
+import { getDashboardSummary, type DashboardSummary } from "@/lib/api";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -12,6 +12,13 @@ function formatCurrency(cents: number) {
   return currencyFormatter.format(cents / 100);
 }
 
+const riskLabels: Record<DashboardSummary["creditCardRisk"], string> = {
+  SAFE: "Seguro",
+  ATTENTION: "Atencao",
+  DANGEROUS: "Perigoso",
+  CHAOTIC: "Sobrevivencia"
+};
+
 export default async function DashboardPage() {
   const session = await auth();
 
@@ -19,22 +26,19 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const profile = await getFinancialProfile(session.user);
-  const availableCents = profile
-    ? profile.monthlyIncomeCents - profile.monthlySavingGoalCents - profile.safetyMarginCents
-    : 0;
-  const cards = profile
+  const { profile, summary } = await getDashboardSummary(session.user);
+  const cards = summary
     ? [
-        { label: "Bufunfa base livre", value: formatCurrency(availableCents) },
-        { label: "Renda mensal", value: formatCurrency(profile.monthlyIncomeCents) },
-        { label: "Salario", value: `Dia ${profile.mainPaymentDay} (${profile.mainPaymentPercent}%)` },
-        { label: "Adiantamento", value: `Dia ${profile.advancePaymentDay} (${profile.advancePaymentPercent}%)` }
+        { label: "Bufunfa livre real", value: formatCurrency(summary.realFreeMoneyCents) },
+        { label: "Renda prevista", value: formatCurrency(summary.expectedIncomeCents) },
+        { label: "Contas pendentes", value: `${summary.pendingExpensesCount} boletos` },
+        { label: "Fatura atual", value: formatCurrency(summary.currentInvoiceCents) }
       ]
     : [
-        { label: "Bufunfa base livre", value: "Aguardando onboarding" },
-        { label: "Renda mensal", value: "Configure seu perfil" },
-        { label: "Salario", value: "Dia 5" },
-        { label: "Adiantamento", value: "Dia 20" }
+        { label: "Bufunfa livre real", value: "Aguardando onboarding" },
+        { label: "Renda prevista", value: "Configure seu perfil" },
+        { label: "Contas pendentes", value: "Sem dados ainda" },
+        { label: "Fatura atual", value: "Sem dados ainda" }
       ];
 
   return (
@@ -70,21 +74,21 @@ export default async function DashboardPage() {
         ))}
       </section>
 
-      {profile ? (
+      {summary ? (
         <section className="mt-8 grid gap-4 md:grid-cols-3">
           <article className="rounded-lg border bg-card p-5">
-            <p className="text-sm text-muted-foreground">Meta mensal</p>
+            <p className="text-sm text-muted-foreground">Meta protegida</p>
+            <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.protectedGoalCents)}</strong>
+          </article>
+          <article className="rounded-lg border bg-card p-5">
+            <p className="text-sm text-muted-foreground">Proximo pagamento</p>
             <strong className="mt-3 block text-2xl font-semibold">
-              {formatCurrency(profile.monthlySavingGoalCents)}
+              Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
             </strong>
           </article>
           <article className="rounded-lg border bg-card p-5">
-            <p className="text-sm text-muted-foreground">Margem de seguranca</p>
-            <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(profile.safetyMarginCents)}</strong>
-          </article>
-          <article className="rounded-lg border bg-card p-5">
-            <p className="text-sm text-muted-foreground">Ciclo financeiro</p>
-            <strong className="mt-3 block text-2xl font-semibold">Dia {profile.cycleStartDay}</strong>
+            <p className="text-sm text-muted-foreground">Risco do mes</p>
+            <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
           </article>
         </section>
       ) : (
