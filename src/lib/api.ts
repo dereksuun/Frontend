@@ -112,6 +112,7 @@ export type DashboardSummary = {
   pendingExpensesCents: number;
   currentInvoiceCents: number;
   monthlyTransactionsCents: number;
+  extraIncomeCents: number;
   futureInstallmentsCount: number;
   protectedGoalCents: number;
   nextPayment: {
@@ -139,6 +140,19 @@ export type Transaction = {
 
 type TransactionsResponse = {
   transactions: Transaction[];
+};
+
+export type Income = {
+  id: string;
+  userId: string;
+  description: string;
+  amountCents: number;
+  receivedAt: string;
+  type: string;
+};
+
+type IncomesResponse = {
+  incomes: Income[];
 };
 
 export type GoalContribution = {
@@ -301,6 +315,20 @@ export async function getTransactions(user: ApiUser) {
 
   const data = (await response.json()) as TransactionsResponse;
   return data.transactions;
+}
+
+export async function getIncomes(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/incomes`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar as rendas.");
+  }
+
+  const data = (await response.json()) as IncomesResponse;
+  return data.incomes;
 }
 
 export async function getGoals(user: ApiUser) {
