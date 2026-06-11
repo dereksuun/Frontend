@@ -21,6 +21,7 @@ Foi avancado o plano do Bufunfometro/Derycash em ciclos pequenos de branch, comm
 - Fase 9: cards animados no dashboard com Anime.js.
 - Fase 9: base de polimento visual com gauge animado do Bufunfometro, navegacao compacta e superficies mais refinadas.
 - Fase 9: skeleton/loading compartilhado mais proximo da interface final.
+- Fase 9: componente de estado vazio aplicado em contas, rendas, gastos e metas.
 - Fase 10: README atualizado.
 - Tela `/configuracoes` criada.
 - Teste unitario inicial para helper de classes.

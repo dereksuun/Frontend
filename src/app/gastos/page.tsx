@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { BadgeDollarSign } from "lucide-react";
 import { auth } from "@/auth";
+import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { getTransactions } from "@/lib/api";
 import { createTransaction, deleteTransaction } from "./actions";
@@ -72,13 +74,12 @@ export default async function GastosPage() {
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
         <div className="grid gap-4">
           {transactions.length === 0 ? (
-            <article className="rounded-lg border border-dashed bg-card p-6">
-              <p className="text-sm text-muted-foreground">Nenhum gasto avulso registrado.</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-normal">A bufunfa ainda parece intacta.</h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Registre os pequenos gastos para o dashboard mostrar a sobra real do mes.
-              </p>
-            </article>
+            <EmptyState
+              description="Registre os pequenos gastos para o dashboard mostrar a sobra real do mes."
+              eyebrow="Nenhum gasto avulso registrado."
+              icon={BadgeDollarSign}
+              title="A bufunfa ainda parece intacta."
+            />
           ) : (
             transactions.map((transaction) => (
               <article key={transaction.id} className="rounded-lg border bg-card p-5">
