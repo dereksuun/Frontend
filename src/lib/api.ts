@@ -128,6 +128,22 @@ type DashboardSummaryResponse = {
   summary: DashboardSummary | null;
 };
 
+export type TimelineEvent = {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  amountCents: number;
+  direction: "IN" | "OUT";
+  kind: "PAYMENT" | "INCOME" | "BILL" | "CARD" | "SPENDING";
+  status?: string;
+};
+
+type DashboardTimelineResponse = {
+  profile: FinancialProfile | null;
+  events: TimelineEvent[];
+};
+
 export type Transaction = {
   id: string;
   userId: string;
@@ -301,6 +317,19 @@ export async function getDashboardSummary(user: ApiUser) {
   }
 
   return (await response.json()) as DashboardSummaryResponse;
+}
+
+export async function getDashboardTimeline(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/dashboard/timeline`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar a timeline financeira.");
+  }
+
+  return (await response.json()) as DashboardTimelineResponse;
 }
 
 export async function getTransactions(user: ApiUser) {
