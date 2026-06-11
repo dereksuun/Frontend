@@ -14,7 +14,7 @@
   "dependencies": {
     "@hookform/resolvers": "latest",
     "@radix-ui/react-slot": "latest",
-    "animejs": "latest",
+    "animejs": "^4.4.1",
     "class-variance-authority": "latest",
     "clsx": "latest",
     "date-fns": "latest",
