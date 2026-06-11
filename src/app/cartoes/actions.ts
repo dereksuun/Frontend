@@ -73,3 +73,52 @@ export async function deleteCreditCard(formData: FormData) {
   revalidatePath("/cartoes");
   revalidatePath("/dashboard");
 }
+
+export async function createCreditCardPurchase(formData: FormData) {
+  const user = await getRequiredUser();
+
+  const payload = {
+    creditCardId: String(formData.get("creditCardId") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    totalAmountCents: reaisToCents(formData.get("totalAmount")),
+    purchasedAt: String(formData.get("purchasedAt") ?? new Date().toISOString()),
+    category: String(formData.get("category") ?? "Geral"),
+    installmentsCount: numberValue(formData.get("installmentsCount"), 1),
+    notes: String(formData.get("notes") ?? "")
+  };
+
+  const response = await fetch(`${getApiUrl()}/api/credit-card-purchases`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(payload),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel cadastrar a compra.");
+  }
+
+  revalidatePath("/cartoes");
+  revalidatePath("/dashboard");
+}
+
+export async function deleteCreditCardPurchase(formData: FormData) {
+  const user = await getRequiredUser();
+  const purchaseId = String(formData.get("purchaseId") ?? "");
+
+  const response = await fetch(`${getApiUrl()}/api/credit-card-purchases/${purchaseId}`, {
+    method: "DELETE",
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel remover a compra.");
+  }
+
+  revalidatePath("/cartoes");
+  revalidatePath("/dashboard");
+}

@@ -76,6 +76,34 @@ type CreditCardsResponse = {
   cards: CreditCard[];
 };
 
+export type CreditCardInstallment = {
+  id: string;
+  purchaseId: string;
+  userId: string;
+  number: number;
+  amountCents: number;
+  invoiceMonth: string;
+  paidAt: string | null;
+};
+
+export type CreditCardPurchase = {
+  id: string;
+  userId: string;
+  creditCardId: string;
+  description: string;
+  totalAmountCents: number;
+  purchasedAt: string;
+  category: string;
+  installmentsCount: number;
+  notes: string | null;
+  creditCard: CreditCard;
+  installments: CreditCardInstallment[];
+};
+
+type CreditCardPurchasesResponse = {
+  purchases: CreditCardPurchase[];
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -134,4 +162,18 @@ export async function getCreditCards(user: ApiUser) {
 
   const data = (await response.json()) as CreditCardsResponse;
   return data.cards;
+}
+
+export async function getCreditCardPurchases(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/credit-card-purchases`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar as compras do cartao.");
+  }
+
+  const data = (await response.json()) as CreditCardPurchasesResponse;
+  return data.purchases;
 }
