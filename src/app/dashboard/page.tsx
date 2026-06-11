@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { MotionCard } from "@/components/motion/motion-card";
-import { getDashboardSummary, type DashboardSummary } from "@/lib/api";
+import { SpendingCategoryChart } from "@/components/charts/spending-category-chart";
+import { getDashboardSummary, getTransactions, type DashboardSummary } from "@/lib/api";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -20,6 +21,19 @@ const riskLabels: Record<DashboardSummary["creditCardRisk"], string> = {
   CHAOTIC: "Sobrevivencia"
 };
 
+function buildCategoryTotals(transactions: Awaited<ReturnType<typeof getTransactions>>) {
+  const totals = new Map<string, number>();
+
+  for (const transaction of transactions) {
+    totals.set(transaction.category, (totals.get(transaction.category) ?? 0) + transaction.amountCents);
+  }
+
+  return Array.from(totals.entries())
+    .map(([category, amountCents]) => ({ category, amountCents }))
+    .sort((a, b) => b.amountCents - a.amountCents)
+    .slice(0, 6);
+}
+
 export default async function DashboardPage() {
   const session = await auth();
 
@@ -27,7 +41,11 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const { profile, summary } = await getDashboardSummary(session.user);
+  const [{ profile, summary }, transactions] = await Promise.all([
+    getDashboardSummary(session.user),
+    getTransactions(session.user)
+  ]);
+  const categoryTotals = buildCategoryTotals(transactions);
   const cards = summary
     ? [
         { label: "Bufunfa livre real", value: formatCurrency(summary.realFreeMoneyCents) },
@@ -94,28 +112,45 @@ export default async function DashboardPage() {
       </section>
 
       {summary ? (
-        <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MotionCard delay={360}>
-            <p className="text-sm text-muted-foreground">Meta protegida</p>
-            <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.protectedGoalCents)}</strong>
-          </MotionCard>
-          <MotionCard delay={440}>
-            <p className="text-sm text-muted-foreground">Proximo pagamento</p>
-            <strong className="mt-3 block text-2xl font-semibold">
-              Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
-            </strong>
-          </MotionCard>
-          <MotionCard delay={520}>
-            <p className="text-sm text-muted-foreground">Gastos avulsos</p>
-            <strong className="mt-3 block text-2xl font-semibold">
-              {formatCurrency(summary.monthlyTransactionsCents)}
-            </strong>
-          </MotionCard>
-          <MotionCard delay={600}>
-            <p className="text-sm text-muted-foreground">Risco do mes</p>
-            <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
-          </MotionCard>
-        </section>
+        <>
+          <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MotionCard delay={360}>
+              <p className="text-sm text-muted-foreground">Meta protegida</p>
+              <strong className="mt-3 block text-2xl font-semibold">
+                {formatCurrency(summary.protectedGoalCents)}
+              </strong>
+            </MotionCard>
+            <MotionCard delay={440}>
+              <p className="text-sm text-muted-foreground">Proximo pagamento</p>
+              <strong className="mt-3 block text-2xl font-semibold">
+                Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
+              </strong>
+            </MotionCard>
+            <MotionCard delay={520}>
+              <p className="text-sm text-muted-foreground">Gastos avulsos</p>
+              <strong className="mt-3 block text-2xl font-semibold">
+                {formatCurrency(summary.monthlyTransactionsCents)}
+              </strong>
+            </MotionCard>
+            <MotionCard delay={600}>
+              <p className="text-sm text-muted-foreground">Risco do mes</p>
+              <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
+            </MotionCard>
+          </section>
+
+          <section className="mt-8">
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm text-secondary">Raio-X da bufunfa</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-normal">Gastos por categoria</h2>
+              </div>
+              <Button asChild variant="secondary">
+                <a href="/gastos">Registrar gasto</a>
+              </Button>
+            </div>
+            <SpendingCategoryChart data={categoryTotals} />
+          </section>
+        </>
       ) : (
         <section className="mt-8 rounded-lg border border-dashed bg-card p-6">
           <p className="text-sm text-muted-foreground">Nenhum perfil financeiro salvo ainda.</p>
