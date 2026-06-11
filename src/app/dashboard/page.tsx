@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     <main className="mx-auto min-h-screen w-full max-w-7xl px-8 py-8">
       <header className="flex items-start justify-between gap-6">
         <div>
-          <p className="text-sm text-secondary">Meu Bufunfometro</p>
+          <p className="text-sm text-secondary">Meu Derycash</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-normal">Resumo financeiro</h1>
           <p className="mt-3 text-muted-foreground">
             Ola, {session.user.name ?? session.user.email ?? "usuario"}. Vamos montar seu perfil financeiro.

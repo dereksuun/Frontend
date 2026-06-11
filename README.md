@@ -1,6 +1,6 @@
-# Bufunfometro Frontend
+# Derycash Frontend
 
-Interface web do Bufunfometro.
+Interface web do Derycash.
 
 ## Direcao inicial
 
