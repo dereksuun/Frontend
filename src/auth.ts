@@ -19,7 +19,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     authorized({ auth: session, request }) {
-      const isInternalRoute = ["/dashboard", "/onboarding", "/contas", "/cartoes", "/configuracoes"].some((path) =>
+      const isInternalRoute = ["/dashboard", "/onboarding", "/contas", "/cartoes", "/gastos", "/configuracoes"].some((path) =>
         request.nextUrl.pathname.startsWith(path)
       );
 

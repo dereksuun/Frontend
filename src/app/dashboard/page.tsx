@@ -59,6 +59,9 @@ export default async function DashboardPage() {
           <Button asChild variant="secondary">
             <a href="/cartoes">Cartoes</a>
           </Button>
+          <Button asChild variant="secondary">
+            <a href="/gastos">Gastos</a>
+          </Button>
           <Button asChild>
             <a href="/onboarding">{profile ? "Editar perfil" : "Configurar onboarding"}</a>
           </Button>
@@ -75,7 +78,7 @@ export default async function DashboardPage() {
       </section>
 
       {summary ? (
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
+        <section className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <article className="rounded-lg border bg-card p-5">
             <p className="text-sm text-muted-foreground">Meta protegida</p>
             <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.protectedGoalCents)}</strong>
@@ -84,6 +87,12 @@ export default async function DashboardPage() {
             <p className="text-sm text-muted-foreground">Proximo pagamento</p>
             <strong className="mt-3 block text-2xl font-semibold">
               Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
+            </strong>
+          </article>
+          <article className="rounded-lg border bg-card p-5">
+            <p className="text-sm text-muted-foreground">Gastos avulsos</p>
+            <strong className="mt-3 block text-2xl font-semibold">
+              {formatCurrency(summary.monthlyTransactionsCents)}
             </strong>
           </article>
           <article className="rounded-lg border bg-card p-5">
