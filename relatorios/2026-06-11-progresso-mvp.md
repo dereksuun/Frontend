@@ -16,6 +16,8 @@ Foi avancado o plano do Bufunfometro/Derycash em ciclos pequenos de branch, comm
 - Fase 6: tela `/metas` para cofrinhos, progresso e aportes.
 - Fase 7: tela `/posso-gastar` para simular compras.
 - Fase 8: tela `/investimentos` com simulador educativo e aviso financeiro.
+- Fase 8: tela `/indicadores` com Selic, IPCA e CDI vindos do cache do backend.
+- Fase 4: grafico de gastos por categoria no dashboard com Recharts.
 - Fase 9: cards animados no dashboard com Anime.js.
 - Fase 10: README atualizado.
 - Tela `/configuracoes` criada.
@@ -37,7 +39,6 @@ Foi avancado o plano do Bufunfometro/Derycash em ciclos pequenos de branch, comm
 ## Pendencias principais
 
 - Melhorar UX de erros em Server Actions.
-- Adicionar graficos com Recharts.
 - Adicionar skeletons/loading states.
 - Ampliar testes de componentes.
-- Integrar indicadores reais e cron quando o provedor de dados for escolhido.
+- Expandir indicadores e graficos conforme novos dados entrarem.
