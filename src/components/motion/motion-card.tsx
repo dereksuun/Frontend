@@ -30,7 +30,13 @@ export function MotionCard({ children, className, delay = 0 }: MotionCardProps) 
   }, [delay]);
 
   return (
-    <article ref={cardRef} className={cn("rounded-lg border bg-card p-5 opacity-0", className)}>
+    <article
+      ref={cardRef}
+      className={cn(
+        "rounded-lg border bg-card/90 p-5 opacity-0 shadow-xl shadow-black/15 transition-colors hover:border-primary/40",
+        className
+      )}
+    >
       {children}
     </article>
   );
