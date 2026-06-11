@@ -7,6 +7,7 @@ export const config = {
     "/contas/:path*",
     "/cartoes/:path*",
     "/gastos/:path*",
+    "/metas/:path*",
     "/configuracoes/:path*"
   ]
 };
