@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { BufunfometroGauge } from "@/components/dashboard/bufunfometro-gauge";
 import { MotionCard } from "@/components/motion/motion-card";
 import { SpendingCategoryChart } from "@/components/charts/spending-category-chart";
 import { MonthlyTimeline } from "@/components/dashboard/monthly-timeline";
+import { DashboardNav } from "@/components/layout/dashboard-nav";
 import { getDashboardSummary, getDashboardTimeline, getTransactions, type DashboardSummary } from "@/lib/api";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
@@ -63,49 +65,35 @@ export default async function DashboardPage() {
       ];
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-7xl px-8 py-8">
-      <header className="flex items-start justify-between gap-6">
+    <main className="mx-auto min-h-screen w-full max-w-7xl px-5 py-6 md:px-8 md:py-8">
+      <header className="flex flex-col gap-5">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-sm text-secondary">Meu Derycash</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-normal md:text-4xl">Resumo financeiro</h1>
+          </div>
+          <Button asChild>
+            <a href="/onboarding">{profile ? "Editar perfil" : "Configurar onboarding"}</a>
+          </Button>
+        </div>
+        <DashboardNav />
         <div>
-          <p className="text-sm text-secondary">Meu Derycash</p>
-          <h1 className="mt-2 text-4xl font-semibold tracking-normal">Resumo financeiro</h1>
           <p className="mt-3 text-muted-foreground">
             Ola, {session.user.name ?? session.user.email ?? "usuario"}.{" "}
             {profile ? "Seu perfil financeiro inicial ja esta carregado." : "Vamos montar seu perfil financeiro."}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Button asChild variant="secondary">
-            <a href="/rendas">Rendas</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/contas">Contas fixas</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/cartoes">Cartoes</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/gastos">Gastos</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/metas">Metas</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/posso-gastar">Posso gastar?</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/investimentos">Investimentos</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/indicadores">Indicadores</a>
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="/configuracoes">Configuracoes</a>
-          </Button>
-          <Button asChild>
-            <a href="/onboarding">{profile ? "Editar perfil" : "Configurar onboarding"}</a>
-          </Button>
-        </div>
       </header>
+
+      {summary ? (
+        <div className="mt-8">
+          <BufunfometroGauge
+            expectedIncomeCents={summary.expectedIncomeCents}
+            freeMoneyCents={summary.realFreeMoneyCents}
+            risk={summary.creditCardRisk}
+          />
+        </div>
+      ) : null}
 
       <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {cards.map((card, index) => (
@@ -126,25 +114,25 @@ export default async function DashboardPage() {
               </strong>
             </MotionCard>
             <MotionCard delay={440}>
-            <p className="text-sm text-muted-foreground">Proximo pagamento</p>
-            <strong className="mt-3 block text-2xl font-semibold">
-              Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
-            </strong>
-          </MotionCard>
-          <MotionCard delay={520}>
-            <p className="text-sm text-muted-foreground">Renda extra</p>
-            <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.extraIncomeCents)}</strong>
-          </MotionCard>
-          <MotionCard delay={600}>
-            <p className="text-sm text-muted-foreground">Gastos avulsos</p>
-            <strong className="mt-3 block text-2xl font-semibold">
-              {formatCurrency(summary.monthlyTransactionsCents)}
-            </strong>
-          </MotionCard>
-          <MotionCard delay={680}>
-            <p className="text-sm text-muted-foreground">Risco do mes</p>
-            <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
-          </MotionCard>
+              <p className="text-sm text-muted-foreground">Proximo pagamento</p>
+              <strong className="mt-3 block text-2xl font-semibold">
+                Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
+              </strong>
+            </MotionCard>
+            <MotionCard delay={520}>
+              <p className="text-sm text-muted-foreground">Renda extra</p>
+              <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.extraIncomeCents)}</strong>
+            </MotionCard>
+            <MotionCard delay={600}>
+              <p className="text-sm text-muted-foreground">Gastos avulsos</p>
+              <strong className="mt-3 block text-2xl font-semibold">
+                {formatCurrency(summary.monthlyTransactionsCents)}
+              </strong>
+            </MotionCard>
+            <MotionCard delay={680}>
+              <p className="text-sm text-muted-foreground">Risco do mes</p>
+              <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
+            </MotionCard>
           </section>
 
           <section className="mt-8">
