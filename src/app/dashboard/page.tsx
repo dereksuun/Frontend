@@ -73,6 +73,9 @@ export default async function DashboardPage() {
             <a href="/investimentos">Investimentos</a>
           </Button>
           <Button asChild variant="secondary">
+            <a href="/indicadores">Indicadores</a>
+          </Button>
+          <Button asChild variant="secondary">
             <a href="/configuracoes">Configuracoes</a>
           </Button>
           <Button asChild>

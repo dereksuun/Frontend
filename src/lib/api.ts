@@ -188,6 +188,20 @@ export type InvestmentSimulation = {
   disclaimer: string;
 };
 
+export type MarketIndicator = {
+  id: string;
+  code: string;
+  name: string;
+  value: string | number;
+  referenceAt: string;
+  source: string;
+  updatedAt: string;
+};
+
+type MarketIndicatorsResponse = {
+  indicators: MarketIndicator[];
+};
+
 export function getApiUserId(user: ApiUser) {
   return user.email ?? user.name ?? null;
 }
@@ -354,4 +368,18 @@ export async function simulateInvestment(
 
   const data = (await response.json()) as { simulation: InvestmentSimulation };
   return data.simulation;
+}
+
+export async function getMarketIndicators(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/market-data`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar os indicadores.");
+  }
+
+  const data = (await response.json()) as MarketIndicatorsResponse;
+  return data.indicators;
 }
