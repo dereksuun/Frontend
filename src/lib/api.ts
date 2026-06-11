@@ -104,6 +104,30 @@ type CreditCardPurchasesResponse = {
   purchases: CreditCardPurchase[];
 };
 
+export type CreditCardInvoice = {
+  id: string;
+  creditCardId: string;
+  creditCardName: string;
+  invoiceMonth: string;
+  dueDay: number;
+  totalCents: number;
+  paidCents: number;
+  pendingCents: number;
+  status: "PAID" | "PENDING";
+  installments: Array<{
+    id: string;
+    number: number;
+    amountCents: number;
+    paidAt: string | null;
+    purchaseDescription: string;
+    purchaseCategory: string;
+  }>;
+};
+
+type CreditCardInvoicesResponse = {
+  invoices: CreditCardInvoice[];
+};
+
 export type DashboardSummary = {
   realFreeMoneyCents: number;
   expectedIncomeCents: number;
@@ -304,6 +328,20 @@ export async function getCreditCardPurchases(user: ApiUser) {
 
   const data = (await response.json()) as CreditCardPurchasesResponse;
   return data.purchases;
+}
+
+export async function getCreditCardInvoices(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/credit-card-invoices`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar as faturas.");
+  }
+
+  const data = (await response.json()) as CreditCardInvoicesResponse;
+  return data.invoices;
 }
 
 export async function getDashboardSummary(user: ApiUser) {

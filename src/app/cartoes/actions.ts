@@ -122,3 +122,45 @@ export async function deleteCreditCardPurchase(formData: FormData) {
   revalidatePath("/cartoes");
   revalidatePath("/dashboard");
 }
+
+export async function payCreditCardInstallment(formData: FormData) {
+  const user = await getRequiredUser();
+  const installmentId = String(formData.get("installmentId") ?? "");
+
+  const response = await fetch(`${getApiUrl()}/api/credit-card-invoices/installments/${installmentId}/pay`, {
+    method: "POST",
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel marcar a parcela como paga.");
+  }
+
+  revalidatePath("/cartoes");
+  revalidatePath("/dashboard");
+}
+
+export async function payCreditCardInvoice(formData: FormData) {
+  const user = await getRequiredUser();
+
+  const response = await fetch(`${getApiUrl()}/api/credit-card-invoices/pay`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify({
+      creditCardId: String(formData.get("creditCardId") ?? ""),
+      invoiceMonth: String(formData.get("invoiceMonth") ?? "")
+    }),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel marcar a fatura como paga.");
+  }
+
+  revalidatePath("/cartoes");
+  revalidatePath("/dashboard");
+}
