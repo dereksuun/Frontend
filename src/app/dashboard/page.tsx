@@ -73,6 +73,9 @@ export default async function DashboardPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild variant="secondary">
+            <a href="/rendas">Rendas</a>
+          </Button>
+          <Button asChild variant="secondary">
             <a href="/contas">Contas fixas</a>
           </Button>
           <Button asChild variant="secondary">
@@ -121,21 +124,25 @@ export default async function DashboardPage() {
               </strong>
             </MotionCard>
             <MotionCard delay={440}>
-              <p className="text-sm text-muted-foreground">Proximo pagamento</p>
-              <strong className="mt-3 block text-2xl font-semibold">
-                Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
-              </strong>
-            </MotionCard>
-            <MotionCard delay={520}>
-              <p className="text-sm text-muted-foreground">Gastos avulsos</p>
-              <strong className="mt-3 block text-2xl font-semibold">
-                {formatCurrency(summary.monthlyTransactionsCents)}
-              </strong>
-            </MotionCard>
-            <MotionCard delay={600}>
-              <p className="text-sm text-muted-foreground">Risco do mes</p>
-              <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
-            </MotionCard>
+            <p className="text-sm text-muted-foreground">Proximo pagamento</p>
+            <strong className="mt-3 block text-2xl font-semibold">
+              Dia {summary.nextPayment.day} ({summary.nextPayment.percent}%)
+            </strong>
+          </MotionCard>
+          <MotionCard delay={520}>
+            <p className="text-sm text-muted-foreground">Renda extra</p>
+            <strong className="mt-3 block text-2xl font-semibold">{formatCurrency(summary.extraIncomeCents)}</strong>
+          </MotionCard>
+          <MotionCard delay={600}>
+            <p className="text-sm text-muted-foreground">Gastos avulsos</p>
+            <strong className="mt-3 block text-2xl font-semibold">
+              {formatCurrency(summary.monthlyTransactionsCents)}
+            </strong>
+          </MotionCard>
+          <MotionCard delay={680}>
+            <p className="text-sm text-muted-foreground">Risco do mes</p>
+            <strong className="mt-3 block text-2xl font-semibold">{riskLabels[summary.creditCardRisk]}</strong>
+          </MotionCard>
           </section>
 
           <section className="mt-8">

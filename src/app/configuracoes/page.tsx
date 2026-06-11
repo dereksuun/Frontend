@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const modules = [
   { href: "/onboarding", label: "Perfil financeiro" },
+  { href: "/rendas", label: "Rendas" },
   { href: "/contas", label: "Contas fixas" },
   { href: "/cartoes", label: "Cartoes" },
   { href: "/gastos", label: "Gastos" },

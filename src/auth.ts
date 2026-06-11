@@ -22,6 +22,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const isInternalRoute = [
         "/dashboard",
         "/onboarding",
+        "/rendas",
         "/contas",
         "/cartoes",
         "/gastos",
