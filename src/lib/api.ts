@@ -645,6 +645,7 @@ export async function analyzeInvestment(
 
   return (await response.json()) as {
     source: "nvidia" | "fallback";
+    cache?: "hit" | "miss";
     internalIndexes: InvestmentIndexes;
     analysis: InvestmentAnalysis;
   };

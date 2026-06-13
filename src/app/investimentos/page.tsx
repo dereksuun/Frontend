@@ -414,6 +414,7 @@ export default async function InvestimentosPage({ searchParams }: PageProps) {
                 </div>
                 <span className="rounded-md border border-secondary/40 bg-secondary/10 px-3 py-1 text-xs uppercase text-secondary">
                   {intelligence.source === "nvidia" ? "NVIDIA" : "Fallback"}
+                  {intelligence.cache ? ` / cache ${intelligence.cache}` : ""}
                 </span>
               </div>
               <p className="mt-4 text-muted-foreground">{intelligence.analysis.summary}</p>
