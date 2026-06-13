@@ -8,7 +8,7 @@ export default function LoginPage() {
       <section>
         <p className="text-sm font-medium text-secondary">Entrada segura</p>
         <h1 className="mt-4 max-w-3xl text-5xl font-semibold tracking-normal md:text-6xl">
-          Entre para medir sua bufunfa de verdade.
+          Entre para ver o quão lascado você tá de grana
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
           No MVP, o acesso usa provedores externos para evitar senha propria e manter a base mais segura.
