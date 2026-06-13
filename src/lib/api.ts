@@ -724,6 +724,40 @@ export async function getInvestmentPortfolio(user: ApiUser) {
   return (await response.json()) as InvestmentPortfolio;
 }
 
+export async function createManualInvestmentMovement(
+  user: ApiUser,
+  input: {
+    institution: InvestmentImportPreview["institution"];
+    platformName: string;
+    ticker: string;
+    assetName?: string;
+    assetType: string;
+    movementType: "BUY" | "SELL" | "DIVIDEND" | "JCP" | "INCOME" | "POSITION" | "DEPOSIT" | "WITHDRAWAL" | "OTHER";
+    occurredAt: string;
+    quantity?: number;
+    unitPriceCents?: number;
+    totalCents: number;
+    feesCents?: number;
+    notes?: string;
+  }
+) {
+  const response = await fetch(`${getApiUrl()}/api/investments/movements`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(input),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel registrar o movimento de investimento.");
+  }
+
+  return (await response.json()) as { movement: unknown };
+}
+
 export async function getMarketIndicators(user: ApiUser) {
   const response = await fetch(`${getApiUrl()}/api/market-data`, {
     headers: getApiUserHeaders(user),

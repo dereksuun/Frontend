@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { analyzeInvestment, getInvestmentPortfolio, simulateInvestment } from "@/lib/api";
+import { createInvestmentMovement } from "./actions";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -182,6 +183,136 @@ export default async function InvestimentosPage({ searchParams }: PageProps) {
           ) : null}
         </section>
       ) : null}
+
+      <section className="mt-8 grid gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
+        <form action={createInvestmentMovement} className="grid h-fit gap-4 rounded-lg border bg-card p-5">
+          <div>
+            <p className="text-sm text-secondary">Fallback manual</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-normal">Registrar movimento</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Use quando o extrato ainda precisar de parser ou quando quiser corrigir uma linha pontual.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Instituicao</span>
+              <select className="h-10 rounded-md border bg-background px-3 outline-none focus:ring-2 focus:ring-ring" name="institution">
+                <option value="XP">XP</option>
+                <option value="B3">B3</option>
+                <option value="INTER">Inter</option>
+                <option value="NUBANK">Nubank</option>
+                <option value="ITAU">Itau</option>
+                <option value="OTHER">Outra</option>
+              </select>
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Plataforma</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                defaultValue="Manual"
+                name="platformName"
+              />
+            </label>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Ticker</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                name="ticker"
+                placeholder="PETR4"
+                required
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Tipo de ativo</span>
+              <select className="h-10 rounded-md border bg-background px-3 outline-none focus:ring-2 focus:ring-ring" name="assetType">
+                <option value="acao">Acao</option>
+                <option value="fii">FII</option>
+                <option value="etf">ETF</option>
+                <option value="renda_fixa">Renda fixa</option>
+                <option value="fundo">Fundo</option>
+                <option value="cripto">Cripto</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Movimento</span>
+              <select className="h-10 rounded-md border bg-background px-3 outline-none focus:ring-2 focus:ring-ring" name="movementType">
+                <option value="BUY">Compra</option>
+                <option value="SELL">Venda</option>
+                <option value="POSITION">Posicao inicial</option>
+                <option value="DIVIDEND">Dividendo</option>
+                <option value="JCP">JCP</option>
+                <option value="INCOME">Rendimento</option>
+              </select>
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Data</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                defaultValue={new Date().toISOString().slice(0, 10)}
+                name="occurredAt"
+                type="date"
+              />
+            </label>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Quantidade</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                min="0"
+                name="quantity"
+                step="0.000001"
+                type="number"
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Valor total</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                name="total"
+                placeholder="385,00"
+                required
+              />
+            </label>
+            <label className="grid gap-2 text-sm">
+              <span className="text-muted-foreground">Taxas</span>
+              <input
+                className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                defaultValue="0,00"
+                name="fees"
+              />
+            </label>
+          </div>
+
+          <label className="grid gap-2 text-sm">
+            <span className="text-muted-foreground">Observacao</span>
+            <input
+              className="h-10 rounded-md border bg-background px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+              name="notes"
+              placeholder="Registro manual"
+            />
+          </label>
+
+          <Button type="submit">Salvar movimento</Button>
+        </form>
+
+        <section className="rounded-lg border border-dashed bg-card p-6">
+          <p className="text-sm text-muted-foreground">Importacao continua sendo o caminho principal.</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-normal">Manual entra como rede de seguranca.</h2>
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            O Derycash atualiza a posicao com regras deterministicas para compra, venda e posicao inicial. Proventos
+            entram como movimento financeiro sem alterar quantidade.
+          </p>
+        </section>
+      </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[24rem_minmax(0,1fr)]">
         <form className="grid h-fit gap-4 rounded-lg border bg-card p-5">
