@@ -79,6 +79,33 @@ export async function addGoalContribution(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
+export async function updateGoal(formData: FormData) {
+  const user = await getRequiredUser();
+  const goalId = String(formData.get("goalId") ?? "");
+
+  const response = await fetch(`${getApiUrl()}/api/goals/${goalId}`, {
+    method: "PUT",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify({
+      targetAmountCents: reaisToCents(formData.get("targetAmount")),
+      currentCents: reaisToCents(formData.get("currentAmount")),
+      deadline: String(formData.get("deadline") ?? ""),
+      priority: numberValue(formData.get("priority"), 0)
+    }),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel atualizar a meta.");
+  }
+
+  revalidatePath("/metas");
+  revalidatePath("/dashboard");
+}
+
 export async function deleteGoal(formData: FormData) {
   const user = await getRequiredUser();
   const goalId = String(formData.get("goalId") ?? "");

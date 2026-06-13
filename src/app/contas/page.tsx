@@ -16,6 +16,15 @@ function formatCurrency(cents: number) {
   return currencyFormatter.format(cents / 100);
 }
 
+function averageVariableHistoryCents(expense: Awaited<ReturnType<typeof getRecurringExpenses>>[number]) {
+  const paidOrEstimatedValues = expense.monthlyExpenses
+    .map((monthlyExpense) => monthlyExpense.actualAmountCents ?? monthlyExpense.expectedAmountCents)
+    .filter((value) => value > 0);
+
+  if (paidOrEstimatedValues.length === 0) return null;
+  return Math.round(paidOrEstimatedValues.reduce((sum, value) => sum + value, 0) / paidOrEstimatedValues.length);
+}
+
 export default async function ContasPage() {
   const session = await auth();
 
@@ -72,6 +81,7 @@ export default async function ContasPage() {
             expenses.map((expense) => {
               const monthlyExpense = expense.monthlyExpenses[0];
               const isPaid = monthlyExpense?.status === "PAID";
+              const variableAverageCents = expense.isVariable ? averageVariableHistoryCents(expense) : null;
 
               return (
                 <article key={expense.id} className="rounded-lg border bg-card p-5 opacity-0" data-list-row>
@@ -94,6 +104,12 @@ export default async function ContasPage() {
                         Vence no dia {expense.dueDay}. {expense.isVariable ? "Valor variavel." : "Valor fixo."}{" "}
                         {expense.isEssential ? "Essencial." : "Nao essencial."}
                       </p>
+                      {variableAverageCents ? (
+                        <p className="mt-2 text-sm text-secondary">
+                          Media recente: {formatCurrency(variableAverageCents)} em {expense.monthlyExpenses.length} mes
+                          {expense.monthlyExpenses.length > 1 ? "es" : ""}.
+                        </p>
+                      ) : null}
                     </div>
                     <strong className="text-2xl font-semibold">{formatCurrency(expense.expectedAmountCents)}</strong>
                   </div>

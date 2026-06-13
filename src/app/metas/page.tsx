@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { EmptyState } from "@/components/feedback/empty-state";
 import { Button } from "@/components/ui/button";
 import { getGoals } from "@/lib/api";
-import { addGoalContribution, createGoal, deleteGoal } from "./actions";
+import { addGoalContribution, createGoal, deleteGoal, updateGoal } from "./actions";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -27,6 +27,24 @@ function todayInputValue() {
 
 function progressPercent(currentCents: number, targetAmountCents: number) {
   return Math.min(100, Math.round((currentCents / targetAmountCents) * 100));
+}
+
+function dateInputValue(value: string | null) {
+  return value ? new Date(value).toISOString().slice(0, 10) : "";
+}
+
+function monthlyContributionSuggestion(goal: Awaited<ReturnType<typeof getGoals>>[number]) {
+  if (!goal.deadline) return null;
+
+  const missingCents = Math.max(0, goal.targetAmountCents - goal.currentCents);
+  const today = new Date();
+  const deadline = new Date(goal.deadline);
+  const months = Math.max(
+    1,
+    (deadline.getUTCFullYear() - today.getUTCFullYear()) * 12 + deadline.getUTCMonth() - today.getUTCMonth() + 1
+  );
+
+  return Math.ceil(missingCents / months);
 }
 
 export default async function MetasPage() {
@@ -88,6 +106,7 @@ export default async function MetasPage() {
             goals.map((goal) => {
               const percent = progressPercent(goal.currentCents, goal.targetAmountCents);
               const missingCents = Math.max(0, goal.targetAmountCents - goal.currentCents);
+              const suggestedMonthlyCents = monthlyContributionSuggestion(goal);
 
               return (
                 <article key={goal.id} className="rounded-lg border bg-card p-5">
@@ -105,6 +124,11 @@ export default async function MetasPage() {
                       <p className="mt-2 text-sm text-muted-foreground">
                         {formatCurrency(goal.currentCents)} guardados. Faltam {formatCurrency(missingCents)}.
                       </p>
+                      {suggestedMonthlyCents ? (
+                        <p className="mt-2 text-sm text-secondary">
+                          Sugestao ate o prazo: {formatCurrency(suggestedMonthlyCents)} por mes.
+                        </p>
+                      ) : null}
                     </div>
                     <strong className="text-2xl font-semibold">{formatCurrency(goal.targetAmountCents)}</strong>
                   </div>
@@ -137,6 +161,53 @@ export default async function MetasPage() {
                       </Button>
                     </form>
                   </div>
+
+                  <form action={updateGoal} className="mt-5 grid gap-3 rounded-md bg-background p-3 md:grid-cols-4">
+                    <input name="goalId" type="hidden" value={goal.id} />
+                    <label className="grid gap-2 text-sm">
+                      <span className="text-muted-foreground">Objetivo</span>
+                      <input
+                        className="h-10 rounded-md border bg-card px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        defaultValue={(goal.targetAmountCents / 100).toFixed(2).replace(".", ",")}
+                        name="targetAmount"
+                        type="text"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm">
+                      <span className="text-muted-foreground">Guardado</span>
+                      <input
+                        className="h-10 rounded-md border bg-card px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        defaultValue={(goal.currentCents / 100).toFixed(2).replace(".", ",")}
+                        name="currentAmount"
+                        type="text"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm">
+                      <span className="text-muted-foreground">Prazo</span>
+                      <input
+                        className="h-10 rounded-md border bg-card px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        defaultValue={dateInputValue(goal.deadline)}
+                        name="deadline"
+                        type="date"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm">
+                      <span className="text-muted-foreground">Prioridade</span>
+                      <input
+                        className="h-10 rounded-md border bg-card px-3 text-foreground outline-none focus:ring-2 focus:ring-ring"
+                        defaultValue={goal.priority}
+                        max={5}
+                        min={0}
+                        name="priority"
+                        type="number"
+                      />
+                    </label>
+                    <div className="md:col-span-4">
+                      <Button type="submit" variant="secondary">
+                        Atualizar meta
+                      </Button>
+                    </div>
+                  </form>
                 </article>
               );
             })
