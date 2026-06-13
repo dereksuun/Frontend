@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { getApiUrl } from "@/lib/api";
 import { ImportPreviewForm } from "./import-preview-form";
 
 export default async function ImportarInvestimentosPage() {
@@ -23,6 +24,9 @@ export default async function ImportarInvestimentosPage() {
         <div className="flex flex-wrap gap-3">
           <Button asChild variant="secondary">
             <a href="/investimentos">Simulador</a>
+          </Button>
+          <Button asChild variant="secondary">
+            <a href={`${getApiUrl()}/api/investments/imports/template.csv`}>Baixar CSV modelo</a>
           </Button>
           <Button asChild>
             <a href="/indicadores">Indicadores</a>
