@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { ReceiptText } from "lucide-react";
 import { auth } from "@/auth";
 import { EmptyState } from "@/components/feedback/empty-state";
+import { AnimatedDataList } from "@/components/motion/animated-data-list";
 import { Button } from "@/components/ui/button";
 import { getRecurringExpenses } from "@/lib/api";
 import { createRecurringExpense, deleteRecurringExpense, payRecurringExpense } from "./actions";
@@ -59,7 +60,7 @@ export default async function ContasPage() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-        <div className="grid gap-4">
+        <AnimatedDataList>
           {expenses.length === 0 ? (
             <EmptyState
               description="Comece pelas contas que sempre aparecem: moradia, internet, celular, assinaturas e mensalidades."
@@ -73,7 +74,7 @@ export default async function ContasPage() {
               const isPaid = monthlyExpense?.status === "PAID";
 
               return (
-                <article key={expense.id} className="rounded-lg border bg-card p-5">
+                <article key={expense.id} className="rounded-lg border bg-card p-5 opacity-0" data-list-row>
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -132,7 +133,7 @@ export default async function ContasPage() {
               {paidExpenses.length > 1 ? "s" : ""} como paga{paidExpenses.length > 1 ? "s" : ""} neste mes.
             </p>
           ) : null}
-        </div>
+        </AnimatedDataList>
 
         <form action={createRecurringExpense} className="grid h-fit gap-4 rounded-lg border bg-card p-5">
           <div>

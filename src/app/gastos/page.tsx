@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { BadgeDollarSign } from "lucide-react";
 import { auth } from "@/auth";
 import { EmptyState } from "@/components/feedback/empty-state";
+import { AnimatedDataList } from "@/components/motion/animated-data-list";
 import { Button } from "@/components/ui/button";
 import { getTransactions } from "@/lib/api";
 import { createTransaction, deleteTransaction } from "./actions";
@@ -72,7 +73,7 @@ export default async function GastosPage() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-        <div className="grid gap-4">
+        <AnimatedDataList>
           {transactions.length === 0 ? (
             <EmptyState
               description="Registre os pequenos gastos para o dashboard mostrar a sobra real do mes."
@@ -82,7 +83,7 @@ export default async function GastosPage() {
             />
           ) : (
             transactions.map((transaction) => (
-              <article key={transaction.id} className="rounded-lg border bg-card p-5">
+              <article key={transaction.id} className="rounded-lg border bg-card p-5 opacity-0" data-list-row>
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -110,7 +111,7 @@ export default async function GastosPage() {
               </article>
             ))
           )}
-        </div>
+        </AnimatedDataList>
 
         <form action={createTransaction} className="grid h-fit gap-4 rounded-lg border bg-card p-5">
           <div>
