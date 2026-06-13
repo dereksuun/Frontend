@@ -28,7 +28,9 @@ Interface web do Derycash, uma aplicacao de controle financeiro pessoal focada e
 /gastos           Gastos avulsos
 /metas            Cofrinhos/metas
 /posso-gastar     Simulador de compra
-/investimentos    Simulador educativo de investimentos
+/investimentos    Simulador, analise inteligente e estudos de ativos
+/investimentos/importar Previa de importacao de extratos
+/indicadores      Radar financeiro
 ```
 
 ## Fluxo principal
@@ -69,6 +71,10 @@ npm run build
 - Cards de leitura rapida
 - Estados vazios com personalidade
 - Microinteracoes no dashboard com Anime.js
+- Cards de investimento com leitura progressiva
+- Importacao sempre com previa antes de confirmacao
+- Carteira de investimentos alimentada por importacoes confirmadas
+- Numeros animados em indicadores financeiros
 
 ## Aviso financeiro
 

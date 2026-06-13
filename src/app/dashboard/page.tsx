@@ -6,7 +6,13 @@ import { MotionCard } from "@/components/motion/motion-card";
 import { SpendingCategoryChart } from "@/components/charts/spending-category-chart";
 import { MonthlyTimeline } from "@/components/dashboard/monthly-timeline";
 import { DashboardNav } from "@/components/layout/dashboard-nav";
-import { getDashboardSummary, getDashboardTimeline, getTransactions, type DashboardSummary } from "@/lib/api";
+import {
+  getDashboardInsight,
+  getDashboardSummary,
+  getDashboardTimeline,
+  getTransactions,
+  type DashboardSummary
+} from "@/lib/api";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   style: "currency",
@@ -44,11 +50,13 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [{ profile, summary }, transactions, timeline] = await Promise.all([
+  const [{ profile, summary }, transactions, timeline, insightResult] = await Promise.all([
     getDashboardSummary(session.user),
     getTransactions(session.user),
-    getDashboardTimeline(session.user)
+    getDashboardTimeline(session.user),
+    getDashboardInsight(session.user).catch(() => ({ profile: null, insight: null }))
   ]);
+  const insight = insightResult.insight;
   const categoryTotals = buildCategoryTotals(transactions);
   const cards = summary
     ? [
@@ -93,6 +101,47 @@ export default async function DashboardPage() {
             risk={summary.creditCardRisk}
           />
         </div>
+      ) : null}
+
+      {insight ? (
+        <section className="mt-6 rounded-lg border bg-card p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm text-secondary">Resumo inteligente</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-normal">Leitura do mes</h2>
+            </div>
+            <span className="rounded-md bg-background px-3 py-1 text-xs uppercase text-muted-foreground">
+              {insight.generatedBy}
+            </span>
+          </div>
+          <p className="mt-4 text-muted-foreground">{insight.summary}</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div>
+              <strong className="text-sm">Pontos bons</strong>
+              <ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
+                {insight.positivePoints.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <strong className="text-sm">Atencao</strong>
+              <ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
+                {insight.attentionPoints.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <strong className="text-sm">Alertas</strong>
+              <ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
+                {(insight.alerts.length > 0 ? insight.alerts : ["Nenhum alerta critico pelas regras atuais."]).map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
       ) : null}
 
       <section className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">

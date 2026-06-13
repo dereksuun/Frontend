@@ -1,12 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import { AnimatedNumber } from "@/components/motion/animated-number";
 import { getMarketIndicators } from "@/lib/api";
-
-const percentFormatter = new Intl.NumberFormat("pt-BR", {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2
-});
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -14,10 +10,6 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   year: "numeric",
   timeZone: "UTC"
 });
-
-function formatIndicatorValue(value: string | number) {
-  return `${percentFormatter.format(Number(value))}%`;
-}
 
 export default async function IndicadoresPage() {
   const session = await auth();
@@ -62,7 +54,9 @@ export default async function IndicadoresPage() {
             {indicators.map((indicator) => (
               <article key={indicator.code} className="rounded-lg border bg-card p-5">
                 <p className="text-sm text-muted-foreground">{indicator.name}</p>
-                <strong className="mt-3 block text-3xl font-semibold">{formatIndicatorValue(indicator.value)}</strong>
+                <strong className="mt-3 block text-3xl font-semibold">
+                  <AnimatedNumber value={Number(indicator.value)} kind="percent" />
+                </strong>
                 <p className="mt-3 text-sm text-muted-foreground">
                   Referencia {dateFormatter.format(new Date(indicator.referenceAt))}
                 </p>

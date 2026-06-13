@@ -152,6 +152,21 @@ type DashboardSummaryResponse = {
   summary: DashboardSummary | null;
 };
 
+export type DashboardInsight = {
+  summary: string;
+  mood: "stable" | "warning" | "critical";
+  alerts: string[];
+  positivePoints: string[];
+  attentionPoints: string[];
+  generatedBy: "deterministic";
+  disclaimer: string;
+};
+
+type DashboardInsightResponse = {
+  profile: FinancialProfile | null;
+  insight: DashboardInsight | null;
+};
+
 export type TimelineEvent = {
   id: string;
   date: string;
@@ -240,6 +255,115 @@ export type InvestmentSimulation = {
     balanceCents: number;
   }>;
   disclaimer: string;
+};
+
+export type InvestmentAnalysis = {
+  summary: string;
+  trendExplanation: string;
+  riskExplanation: string;
+  opportunityLevel: "low" | "moderate" | "high";
+  positivePoints: string[];
+  attentionPoints: string[];
+  newsAnalysis: Array<{
+    title: string;
+    impact: "positive" | "negative" | "neutral" | "risk" | "opportunity";
+    horizon: "short_term" | "long_term" | "unclear";
+    reason: string;
+  }>;
+  disclaimer: string;
+};
+
+export type InvestmentIndexes = {
+  riskScore: number;
+  trendScore: number;
+  attractivenessScore: number;
+  labels: {
+    risk: "low" | "medium" | "high";
+    trend: "up" | "down" | "sideways" | "unclear";
+    attractiveness: "low" | "moderate" | "high";
+  };
+  factors: {
+    risk: string[];
+    trend: string[];
+    attractiveness: string[];
+  };
+};
+
+export type InvestmentImportPreview = {
+  institution: "B3" | "XP" | "INTER" | "NUBANK" | "ITAU" | "OTHER";
+  fileType: "CSV" | "XLSX" | "PDF";
+  status: "READY_FOR_CONFIRMATION" | "NEEDS_REVIEW" | "NEEDS_MANUAL_MAPPING";
+  summary: {
+    operations: number;
+    incomes: number;
+    positions: number;
+    assets: number;
+    reviewItems: number;
+  };
+  rows: Array<{
+    rowNumber: number;
+    ticker?: string;
+    institution: string;
+    movementType?: string;
+    assetType?: string;
+    date?: string;
+    quantity?: number;
+    unitPriceCents?: number | null;
+    totalCents?: number | null;
+    feesCents?: number | null;
+    notes?: string;
+    issues: string[];
+  }>;
+  issues: string[];
+  nextStep: "review_required" | "user_confirmation_required";
+};
+
+export type InvestmentPortfolio = {
+  platforms: Array<{
+    id: string;
+    institution: InvestmentImportPreview["institution"];
+    name: string;
+    active: boolean;
+  }>;
+  positions: Array<{
+    id: string;
+    quantity: string | number;
+    averagePriceCents: number;
+    investedCents: number;
+    asset: {
+      ticker: string;
+      name: string | null;
+      assetType: string;
+    };
+    platform: {
+      name: string;
+      institution: InvestmentImportPreview["institution"];
+    };
+  }>;
+  movements: Array<{
+    id: string;
+    movementType: string;
+    occurredAt: string;
+    quantity: string | number | null;
+    totalCents: number;
+    feesCents: number;
+    asset: {
+      ticker: string;
+      name: string | null;
+    } | null;
+    platform: {
+      name: string;
+    } | null;
+  }>;
+  imports: Array<{
+    id: string;
+    institution: InvestmentImportPreview["institution"];
+    fileType: string;
+    status: string;
+    summary: unknown;
+    confirmedAt: string | null;
+    createdAt: string;
+  }>;
 };
 
 export type MarketIndicator = {
@@ -357,6 +481,19 @@ export async function getDashboardSummary(user: ApiUser) {
   return (await response.json()) as DashboardSummaryResponse;
 }
 
+export async function getDashboardInsight(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/dashboard/summary/insight`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar o insight financeiro.");
+  }
+
+  return (await response.json()) as DashboardInsightResponse;
+}
+
 export async function getDashboardTimeline(user: ApiUser) {
   const response = await fetch(`${getApiUrl()}/api/dashboard/timeline`, {
     headers: getApiUserHeaders(user),
@@ -463,6 +600,128 @@ export async function simulateInvestment(
 
   const data = (await response.json()) as { simulation: InvestmentSimulation };
   return data.simulation;
+}
+
+export async function analyzeInvestment(
+  user: ApiUser,
+  input: {
+    ticker: string;
+    marketData?: {
+      price?: number;
+      dailyChangePercent?: number;
+      change7dPercent?: number;
+      change30dPercent?: number;
+    };
+    fundamentals?: {
+      dividendYield?: number;
+      pl?: number;
+      roe?: number;
+    };
+    internalIndexes?: {
+      riskScore: number;
+      trendScore: number;
+      attractivenessScore: number;
+    };
+    news?: Array<{
+      title: string;
+      source?: string;
+      publishedAt?: string;
+    }>;
+  }
+) {
+  const response = await fetch(`${getApiUrl()}/api/investments/analyze-asset`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(input),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel gerar a analise inteligente.");
+  }
+
+  return (await response.json()) as {
+    source: "nvidia" | "fallback";
+    internalIndexes: InvestmentIndexes;
+    analysis: InvestmentAnalysis;
+  };
+}
+
+export async function previewInvestmentImport(
+  user: ApiUser,
+  input: {
+    institution: "B3" | "XP" | "INTER" | "NUBANK" | "ITAU" | "OTHER";
+    fileType: "CSV" | "XLSX" | "PDF";
+    content: string;
+    saveOriginalFile?: boolean;
+  }
+) {
+  const response = await fetch(`${getApiUrl()}/api/investments/imports/preview`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(input),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel gerar a previa da importacao.");
+  }
+
+  const data = (await response.json()) as { preview: InvestmentImportPreview };
+  return data.preview;
+}
+
+export async function confirmInvestmentImport(
+  user: ApiUser,
+  input: {
+    institution: InvestmentImportPreview["institution"];
+    fileType: InvestmentImportPreview["fileType"];
+    content: string;
+    confirmReviewed: true;
+    saveOriginalFile?: boolean;
+  }
+) {
+  const response = await fetch(`${getApiUrl()}/api/investments/imports/confirm`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      ...getApiUserHeaders(user)
+    },
+    body: JSON.stringify(input),
+    cache: "no-store"
+  });
+
+  const data = (await response.json()) as {
+    confirmed: boolean;
+    message: string;
+    movementsCreated?: number;
+    preview: InvestmentImportPreview;
+  };
+
+  if (!response.ok && !data.message) {
+    throw new Error("Nao foi possivel confirmar a importacao.");
+  }
+
+  return data;
+}
+
+export async function getInvestmentPortfolio(user: ApiUser) {
+  const response = await fetch(`${getApiUrl()}/api/investments/portfolio`, {
+    headers: getApiUserHeaders(user),
+    cache: "no-store"
+  });
+
+  if (!response.ok) {
+    throw new Error("Nao foi possivel carregar a carteira de investimentos.");
+  }
+
+  return (await response.json()) as InvestmentPortfolio;
 }
 
 export async function getMarketIndicators(user: ApiUser) {
