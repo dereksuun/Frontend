@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { PiggyBank } from "lucide-react";
 import { auth } from "@/auth";
 import { EmptyState } from "@/components/feedback/empty-state";
+import { AnimatedProgressBar } from "@/components/motion/animated-progress-bar";
 import { Button } from "@/components/ui/button";
 import { getGoals } from "@/lib/api";
 import { addGoalContribution, createGoal, deleteGoal, updateGoal } from "./actions";
@@ -133,9 +134,7 @@ export default async function MetasPage() {
                     <strong className="text-2xl font-semibold">{formatCurrency(goal.targetAmountCents)}</strong>
                   </div>
 
-                  <div className="mt-5 h-3 overflow-hidden rounded-full bg-background">
-                    <div className="h-full bg-primary" style={{ width: `${percent}%` }} />
-                  </div>
+                  <AnimatedProgressBar value={percent} className="mt-5" />
 
                   <div className="mt-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
                     <form action={addGoalContribution} className="flex flex-col gap-3 sm:flex-row sm:items-end">
